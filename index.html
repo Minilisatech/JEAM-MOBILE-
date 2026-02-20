@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeam Mobile's — Phone Repair Registry</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #13161e;
+  --surface2: #1c1f2a;
+  --surface3: #242836;
+  --border: #2a2d3a;
+  --accent: #f97316;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #eab308;
+  --text: #f1f3f9;
+  --muted: #6b7280;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.5;}
+
+/* LOGIN */
+#login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
+#login-page::before{content:'';position:absolute;top:-30%;left:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(249,115,22,0.12) 0%,transparent 65%);pointer-events:none;}
+.login-wrap{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:3rem 2.5rem;width:100%;max-width:420px;position:relative;z-index:1;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:fadeUp 0.5s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.login-brand{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:2px;color:var(--accent);margin-bottom:0.2rem;}
+.login-brand span{color:var(--text);}
+.login-tagline{color:var(--muted);font-size:0.85rem;margin-bottom:2.5rem;}
+.lbl{display:block;font-size:0.72rem;font-family:'JetBrains Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:0.45rem;}
+.inp{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:0.8rem 1rem;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.95rem;outline:none;transition:border-color 0.2s;margin-bottom:1.2rem;}
+.inp:focus{border-color:var(--accent);}
+.btn-primary{width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:0.85rem;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;cursor:pointer;transition:opacity 0.2s,transform 0.1s;}
+.btn-primary:hover{opacity:0.9;transform:translateY(-1px);}
+.login-hint{margin-top:1.8rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:0.78rem;color:var(--muted);font-family:'JetBrains Mono',monospace;line-height:1.8;}
+.login-hint strong{color:var(--accent);}
+.err-msg{color:var(--red);font-size:0.82rem;margin-top:0.4rem;display:none;}
+
+/* APP */
+#app{display:none;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:230px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;padding:1.2rem 0.8rem;}
+.sb-logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--accent);padding:0.5rem 0.8rem 1.2rem;border-bottom:1px solid var(--border);margin-bottom:1rem;}
+.sb-logo span{color:var(--text);font-size:0.9rem;display:block;letter-spacing:0;font-family:'Outfit',sans-serif;font-weight:300;}
+.nav-btn{display:flex;align-items:center;gap:0.8rem;padding:0.7rem 0.9rem;border-radius:10px;color:var(--muted);font-size:0.88rem;font-weight:500;cursor:pointer;transition:all 0.15s;border:none;background:none;width:100%;text-align:left;margin-bottom:0.15rem;}
+.nav-btn:hover{background:var(--surface2);color:var(--text);}
+.nav-btn.active{background:rgba(249,115,22,0.12);color:var(--accent);}
+.nav-icon{font-size:1.1rem;width:22px;text-align:center;}
+.sb-spacer{flex:1;}
+.sb-user{background:var(--surface2);border-radius:10px;padding:0.8rem;display:flex;align-items:center;gap:0.7rem;}
+.sb-avatar{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:0.85rem;flex-shrink:0;}
+.sb-uname{font-weight:600;font-size:0.85rem;}
+.sb-urole{color:var(--muted);font-size:0.72rem;}
+.sb-logout{background:none;border:none;color:var(--red);cursor:pointer;font-size:0.78rem;padding:0.3rem 0.9rem;text-align:left;width:100%;border-radius:6px;transition:background 0.15s;margin-top:0.4rem;}
+.sb-logout:hover{background:rgba(239,68,68,0.1);}
+
+/* MAIN */
+.main{margin-left:230px;padding:2rem 2.5rem;min-height:100vh;}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+.pt{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:1px;}
+.pt span{color:var(--accent);}
+.psub{color:var(--muted);font-size:0.78rem;font-family:'JetBrains Mono',monospace;margin-top:0.2rem;}
+.section{display:none;}
+.section.active{display:block;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;}
+.stat-lbl{color:var(--muted);font-size:0.7rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:1px;margin:0.2rem 0;}
+.stat-note{font-size:0.75rem;color:var(--muted);}
+
+/* TABLE */
+.tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.tbl-bar{padding:1.1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.tbl-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;}
+.srch{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0.45rem 0.9rem;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.83rem;outline:none;width:210px;transition:border-color 0.2s;}
+.srch:focus{border-color:var(--accent);}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--surface2);padding:0.7rem 1.1rem;text-align:left;font-size:0.68rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);font-weight:400;}
+td{padding:0.85rem 1.1rem;border-top:1px solid var(--border);font-size:0.85rem;vertical-align:middle;}
+tr:hover td{background:rgba(255,255,255,0.015);}
+.badge{display:inline-block;padding:0.18rem 0.6rem;border-radius:20px;font-size:0.68rem;font-family:'JetBrains Mono',monospace;}
+.bg-green{background:rgba(34,197,94,0.15);color:var(--green);}
+.bg-yellow{background:rgba(234,179,8,0.15);color:var(--yellow);}
+.bg-red{background:rgba(239,68,68,0.15);color:var(--red);}
+.bg-blue{background:rgba(59,130,246,0.15);color:var(--blue);}
+.bg-orange{background:rgba(249,115,22,0.15);color:var(--accent);}
+.thumb-sm{width:38px;height:38px;border-radius:8px;object-fit:cover;border:1px solid var(--border);}
+.act-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:0.25rem 0.6rem;font-size:0.75rem;cursor:pointer;transition:all 0.15s;}
+.act-btn:hover{border-color:var(--accent);color:var(--accent);}
+.del-btn{background:none;border:1px solid var(--border);color:var(--red);border-radius:6px;padding:0.25rem 0.6rem;font-size:0.75rem;cursor:pointer;transition:all 0.15s;}
+.del-btn:hover{background:rgba(239,68,68,0.1);}
+.empty{text-align:center;padding:3rem;color:var(--muted);}
+
+/* FORM */
+.fcard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem;}
+.fcard-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;margin-bottom:1.4rem;display:flex;align-items:center;gap:0.6rem;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}
+.fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem;}
+.fg{display:flex;flex-direction:column;gap:0.4rem;}
+.fg.full{grid-column:1/-1;}
+.flbl{font-size:0.7rem;font-family:'JetBrains Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;}
+.fc{background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:0.72rem 0.9rem;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.88rem;outline:none;transition:border-color 0.2s;width:100%;}
+.fc:focus{border-color:var(--accent);}
+textarea.fc{resize:vertical;min-height:80px;}
+select.fc{cursor:pointer;}
+.price-wrap{position:relative;}
+.price-prefix{position:absolute;left:0.9rem;top:50%;transform:translateY(-50%);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.85rem;}
+.price-inp{padding-left:2rem !important;}
+
+/* COLORS */
+.clr-row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-top:0.3rem;}
+.clr-sw{width:26px;height:26px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;}
+.clr-sw:hover{transform:scale(1.2);}
+.clr-sw.sel{border-color:#fff;transform:scale(1.2);}
+input[type=color].clr-custom{width:26px;height:26px;border-radius:6px;border:none;cursor:pointer;padding:0;}
+
+/* FINGERPRINT */
+.fp-area{border:2px dashed var(--border);border-radius:14px;padding:2rem;text-align:center;transition:border-color 0.2s;}
+.fp-area:hover{border-color:var(--accent);}
+.fp-icon{font-size:3.5rem;margin-bottom:0.8rem;cursor:pointer;transition:transform 0.2s;user-select:none;display:inline-block;}
+.fp-icon:hover{transform:scale(1.1);}
+.fp-status{font-size:0.85rem;color:var(--muted);margin-bottom:1rem;}
+.fp-scanning{display:none;width:80px;height:80px;border-radius:50%;border:3px solid var(--accent);border-top-color:transparent;animation:spin 0.8s linear infinite;margin:0 auto 1rem;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fp-result{display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:10px;padding:1rem;margin-top:1rem;}
+.fp-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--green);letter-spacing:1px;}
+.fp-info{font-size:0.8rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.fp-new{display:none;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:10px;padding:0.7rem;margin-top:0.8rem;font-size:0.8rem;color:var(--blue);}
+
+/* CAMERA */
+.cam-box{border:2px dashed var(--border);border-radius:14px;overflow:hidden;position:relative;background:var(--surface2);min-height:160px;display:flex;align-items:center;justify-content:center;}
+.cam-video{width:100%;display:none;border-radius:12px;}
+.cam-canvas{display:none;}
+.cam-preview{width:100%;border-radius:12px;display:none;object-fit:cover;max-height:220px;}
+.cam-placeholder{padding:2rem;text-align:center;color:var(--muted);}
+.cam-placeholder .icon{font-size:2rem;margin-bottom:0.4rem;}
+.cam-btns{display:flex;gap:0.6rem;margin-top:0.7rem;flex-wrap:wrap;}
+.cbtn{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:0.5rem 0.7rem;font-size:0.78rem;cursor:pointer;transition:all 0.15s;font-family:'Outfit',sans-serif;}
+.cbtn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* MEDIA */
+.upzone{border:2px dashed var(--border);border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
+.upzone:hover{border-color:var(--accent);background:rgba(249,115,22,0.03);}
+.upzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.up-text{color:var(--muted);font-size:0.82rem;}
+.up-text strong{color:var(--accent);}
+.media-grid{display:flex;flex-wrap:wrap;gap:0.6rem;margin-top:0.8rem;}
+.m-thumb-wrap{position:relative;display:inline-block;}
+.m-thumb{width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border);}
+.m-del{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;border:none;border-radius:50%;width:17px;height:17px;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.vid-thumb{width:70px;height:70px;background:var(--surface3);border-radius:8px;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:0.6rem;color:var(--muted);gap:2px;}
+
+/* VIDEO */
+.rec-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:5px;animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+/* SUBMIT */
+.sub-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:0.85rem 2.5rem;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;cursor:pointer;transition:opacity 0.2s,transform 0.1s;margin-top:0.8rem;}
+.sub-btn:hover{opacity:0.9;transform:translateY(-1px);}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--accent);color:#fff;padding:0.9rem 1.4rem;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;z-index:9998;transform:translateY(100px);opacity:0;transition:all 0.3s;box-shadow:0 10px 30px rgba(249,115,22,0.35);}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);z-index:500;display:none;align-items:center;justify-content:center;padding:1.5rem;}
+.overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:660px;max-height:88vh;overflow-y:auto;padding:2rem;position:relative;}
+.modal-x{position:absolute;top:1rem;right:1rem;background:var(--surface2);border:none;color:var(--muted);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;}
+.modal-x:hover{color:var(--text);}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:1px;margin-bottom:0.2rem;}
+.modal-sub{color:var(--muted);font-size:0.75rem;font-family:'JetBrains Mono',monospace;margin-bottom:1.2rem;}
+.msec{font-size:0.68rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:1.2rem 0 0.7rem;}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+.mf label{font-size:0.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;display:block;margin-bottom:0.2rem;}
+.mf p{font-size:0.88rem;}
+.mimg-grid{display:flex;flex-wrap:wrap;gap:0.5rem;}
+.mimg{width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid var(--border);}
+.receipt-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:0.4rem 0.9rem;font-size:0.8rem;cursor:pointer;transition:all 0.15s;margin-top:1rem;display:inline-block;}
+.receipt-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* CUSTOMERS */
+.cust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+.cust-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem;transition:border-color 0.2s;}
+.cust-card:hover{border-color:var(--accent);}
+.cust-photo{width:64px;height:64px;border-radius:12px;object-fit:cover;border:2px solid var(--border);margin-bottom:0.8rem;display:block;}
+.cust-photo-ph{width:64px;height:64px;border-radius:12px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:0.8rem;}
+.cust-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.5px;}
+.cust-phone{color:var(--muted);font-size:0.75rem;font-family:'JetBrains Mono',monospace;margin-bottom:0.5rem;}
+.cust-jobs{font-size:0.78rem;color:var(--accent);}
+
+@media(max-width:900px){
+  .sidebar{width:56px;}
+  .sb-logo span,.nav-btn span,.sb-uname,.sb-urole,.sb-logout{display:none;}
+  .sb-logo{font-size:1rem;padding:0.5rem 0;text-align:center;}
+  .main{margin-left:56px;padding:1.2rem;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .fgrid,.fgrid3{grid-template-columns:1fr;}
+  .cust-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page">
+  <div class="login-wrap">
+    <div class="login-brand">Jeam <span>Mobile's</span></div>
+    <p class="login-tagline">📱 Phone Repair Registration System</p>
+    <label class="lbl">Username</label>
+    <input class="inp" id="lu" type="text" placeholder="Enter username" autocomplete="username">
+    <label class="lbl">Password</label>
+    <input class="inp" id="lp" type="password" placeholder="Enter password">
+    <button class="btn-primary" onclick="login()">SIGN IN →</button>
+    <p class="err-msg" id="lerr">❌ Wrong username or password</p>
+    <div class="login-hint"><strong>Accounts:</strong><br>jeam / jeam2024 &nbsp;·&nbsp; staff / staff123</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <nav class="sidebar">
+    <div class="sb-logo">📱 <span>Jeam Mobile's</span></div>
+    <button class="nav-btn active" onclick="goTo('dashboard',this)"><span class="nav-icon">📊</span><span>Dashboard</span></button>
+    <button class="nav-btn" onclick="goTo('job',this)"><span class="nav-icon">🔧</span><span>New Repair Job</span></button>
+    <button class="nav-btn" onclick="goTo('jobs',this)"><span class="nav-icon">📋</span><span>All Jobs</span></button>
+    <button class="nav-btn" onclick="goTo('customers',this)"><span class="nav-icon">👥</span><span>Customers</span></button>
+    <div class="sb-spacer"></div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-av">J</div>
+      <div><div class="sb-uname" id="sb-nm">Jeam</div><div class="sb-urole" id="sb-rl">Engineer</div></div>
+    </div>
+    <button class="sb-logout" onclick="logout()">🚪 Log Out</button>
+  </nav>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section class="section active" id="sec-dashboard">
+      <div class="ph">
+        <div><div class="pt">Dashboard <span>Overview</span></div><div class="psub" id="dash-dt"></div></div>
+        <button class="sub-btn" style="margin-top:0;padding:0.6rem 1.4rem;font-size:1rem" onclick="goTo('job',document.querySelectorAll('.nav-btn')[1])">+ NEW JOB</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-lbl">Total Jobs</div><div class="stat-val" id="st-total">0</div><div class="stat-note">📋 All time</div></div>
+        <div class="stat"><div class="stat-lbl">Today</div><div class="stat-val" id="st-today">0</div><div class="stat-note">🕐 Jobs logged</div></div>
+        <div class="stat"><div class="stat-lbl">Customers</div><div class="stat-val" id="st-custs">0</div><div class="stat-note">👤 Unique</div></div>
+        <div class="stat"><div class="stat-lbl">Revenue</div><div class="stat-val" id="st-rev">₦0</div><div class="stat-note">💰 Estimated</div></div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-bar"><div class="tbl-title">RECENT JOBS</div></div>
+        <table><thead><tr><th>Photo</th><th>Customer</th><th>Phone</th><th>Problem</th><th>Price</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody id="dash-tbody"></tbody></table>
+      </div>
+    </section>
+
+    <!-- NEW JOB -->
+    <section class="section" id="sec-job">
+      <div class="ph"><div><div class="pt">New <span>Repair Job</span></div><div class="psub">Register a customer's phone for repair</div></div></div>
+      <form id="job-form" onsubmit="submitJob(event)">
+
+        <!-- FINGERPRINT -->
+        <div class="fcard">
+          <div class="fcard-title">👆 Customer Fingerprint Scan</div>
+          <div class="fp-area">
+            <div class="fp-icon" id="fp-icon" onclick="scanFinger()" title="Tap to scan fingerprint">🔵</div>
+            <div class="fp-status" id="fp-status">Tap the fingerprint icon to scan<br><small>Returning customers will be recognised automatically</small></div>
+            <div class="fp-scanning" id="fp-scanning"></div>
+            <div class="fp-result" id="fp-result">
+              <div>✅ <span class="fp-name" id="fp-cname"></span></div>
+              <div class="fp-info" id="fp-cinfo"></div>
+              <div style="font-size:0.75rem;color:var(--green);margin-top:0.3rem">✔ Returning customer — details loaded below</div>
+            </div>
+            <div class="fp-new" id="fp-new">🆕 New customer — please fill in their details below</div>
+          </div>
+          <div style="text-align:center;margin-top:1rem">
+            <button type="button" class="cbtn" style="max-width:200px;flex:none" onclick="resetFP()">🔄 Reset / Scan Again</button>
+          </div>
+        </div>
+
+        <!-- CUSTOMER DETAILS -->
+        <div class="fcard">
+          <div class="fcard-title">👤 Customer Details</div>
+          <div class="fgrid3">
+            <div class="fg"><label class="flbl">Full Name *</label><input class="fc" id="f-cname" type="text" placeholder="Customer full name" required></div>
+            <div class="fg"><label class="flbl">Phone Number *</label><input class="fc" id="f-cphone" type="tel" placeholder="e.g. 08012345678" required></div>
+            <div class="fg"><label class="flbl">Alt. Phone</label><input class="fc" id="f-cphone2" type="tel" placeholder="Optional"></div>
+            <div class="fg full"><label class="flbl">Address</label><input class="fc" id="f-caddr" type="text" placeholder="Customer home address"></div>
+          </div>
+        </div>
+
+        <!-- CUSTOMER PHOTO -->
+        <div class="fcard">
+          <div class="fcard-title">📷 Photo of Customer</div>
+          <div class="fgrid">
+            <div>
+              <div class="cam-box" id="cust-cam-box">
+                <div class="cam-placeholder" id="cust-ph"><div class="icon">🤳</div><div>Camera not started</div></div>
+                <video class="cam-video" id="cust-video" autoplay playsinline></video>
+                <canvas class="cam-canvas" id="cust-canvas"></canvas>
+                <img class="cam-preview" id="cust-preview" alt="Customer">
+              </div>
+              <div class="cam-btns">
+                <button type="button" class="cbtn" onclick="startCustCam()">📷 Camera</button>
+                <button type="button" class="cbtn" onclick="snapCust()">📸 Snap</button>
+                <button type="button" class="cbtn" onclick="retakeCust()">🔄 Retake</button>
+              </div>
+            </div>
+            <div>
+              <div class="flbl" style="margin-bottom:0.5rem">Or Upload Photo</div>
+              <div class="upzone" style="height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <input type="file" accept="image/*" onchange="uploadCustPhoto(this)">
+                <div class="up-text">📁 Upload customer photo<br><strong>JPG / PNG</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHONE DETAILS -->
+        <div class="fcard">
+          <div class="fcard-title">📱 Phone / Device Details</div>
+          <div class="fgrid3">
+            <div class="fg"><label class="flbl">Phone Name / Model *</label><input class="fc" id="f-pname" type="text" placeholder="e.g. Samsung A54" required></div>
+            <div class="fg"><label class="flbl">Brand</label><input class="fc" id="f-pbrand" type="text" placeholder="e.g. Samsung, iPhone"></div>
+            <div class="fg"><label class="flbl">IMEI / Serial</label><input class="fc" id="f-imei" type="text" placeholder="Optional"></div>
+            <div class="fg">
+              <label class="flbl">Phone Color</label>
+              <div class="clr-row" id="phone-clr-row">
+                <div class="clr-sw" style="background:#000" data-c="#000000" onclick="pickClr(this)" title="Black"></div>
+                <div class="clr-sw" style="background:#fff;border-color:#555" data-c="#ffffff" onclick="pickClr(this)" title="White"></div>
+                <div class="clr-sw" style="background:#c0c0c0" data-c="#c0c0c0" onclick="pickClr(this)" title="Silver"></div>
+                <div class="clr-sw" style="background:#4444ff" data-c="#4444ff" onclick="pickClr(this)" title="Blue"></div>
+                <div class="clr-sw" style="background:#ff2222" data-c="#ff2222" onclick="pickClr(this)" title="Red"></div>
+                <div class="clr-sw" style="background:#22aa22" data-c="#22aa22" onclick="pickClr(this)" title="Green"></div>
+                <div class="clr-sw" style="background:#ffd700" data-c="#ffd700" onclick="pickClr(this)" title="Gold"></div>
+                <div class="clr-sw" style="background:#ff69b4" data-c="#ff69b4" onclick="pickClr(this)" title="Pink"></div>
+                <div class="clr-sw" style="background:#8b4513" data-c="#8b4513" onclick="pickClr(this)" title="Brown"></div>
+                <input type="color" class="clr-custom" title="Custom color" onchange="customClr(this)">
+              </div>
+              <input type="hidden" id="f-pcolor">
+              <small id="pclr-lbl" style="color:var(--muted);font-size:0.72rem;margin-top:0.3rem;display:block">No color selected</small>
+            </div>
+            <div class="fg"><label class="flbl">Fault Type</label>
+              <select class="fc" id="f-pcond">
+                <option>Cracked Screen</option><option>Water Damage</option>
+                <option>Battery Issue</option><option>Won't Turn On</option>
+                <option>Software Problem</option><option>Charging Port</option>
+                <option>Speaker / Mic Fault</option><option>Camera Fault</option>
+                <option>Overheating</option><option>Other</option>
+              </select>
+            </div>
+            <div class="fg"><label class="flbl">Accessories Included</label><input class="fc" id="f-access" type="text" placeholder="e.g. Charger, Case"></div>
+          </div>
+          <div class="fg" style="margin-top:1rem">
+            <label class="flbl">Problem Description *</label>
+            <textarea class="fc" id="f-problem" placeholder="Describe the problem in full detail…" required></textarea>
+          </div>
+        </div>
+
+        <!-- PRICING -->
+        <div class="fcard">
+          <div class="fcard-title">💰 Pricing & Job Status</div>
+          <div class="fgrid">
+            <div class="fg"><label class="flbl">Repair Price (₦)</label>
+              <div class="price-wrap"><span class="price-prefix">₦</span><input class="fc price-inp" id="f-price" type="number" min="0" placeholder="0.00"></div>
+            </div>
+            <div class="fg"><label class="flbl">Deposit Paid (₦)</label>
+              <div class="price-wrap"><span class="price-prefix">₦</span><input class="fc price-inp" id="f-deposit" type="number" min="0" placeholder="0.00"></div>
+            </div>
+            <div class="fg"><label class="flbl">Job Status</label>
+              <select class="fc" id="f-status">
+                <option>Received — Pending Diagnosis</option>
+                <option>Under Repair</option>
+                <option>Waiting for Parts</option>
+                <option>Ready for Collection</option>
+                <option>Collected / Completed</option>
+                <option>Cannot Repair</option>
+              </select>
+            </div>
+            <div class="fg"><label class="flbl">Expected Completion</label><input class="fc" id="f-due" type="date"></div>
+            <div class="fg"><label class="flbl">Technician</label><input class="fc" id="f-tech" type="text" placeholder="Who handles this repair?"></div>
+            <div class="fg"><label class="flbl">Date Received</label><input class="fc" id="f-date" type="date"></div>
+          </div>
+          <div class="fg" style="margin-top:1rem"><label class="flbl">Extra Notes</label><textarea class="fc" id="f-notes" placeholder="Any extra notes…" style="min-height:65px"></textarea></div>
+        </div>
+
+        <!-- PHONE PHOTOS -->
+        <div class="fcard">
+          <div class="fcard-title">📷 Photos of the Phone</div>
+          <div class="fgrid">
+            <div>
+              <div class="cam-box">
+                <div class="cam-placeholder" id="phone-cam-ph"><div class="icon">📱</div><div>Camera not started</div></div>
+                <video class="cam-video" id="phone-video" autoplay playsinline></video>
+                <canvas class="cam-canvas" id="phone-canvas"></canvas>
+              </div>
+              <div class="cam-btns">
+                <button type="button" class="cbtn" onclick="startPhoneCam()">📷 Start</button>
+                <button type="button" class="cbtn" onclick="snapPhone()">📸 Snap</button>
+              </div>
+            </div>
+            <div>
+              <div class="flbl" style="margin-bottom:0.5rem">Upload Phone Photos</div>
+              <div class="upzone" style="height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <input type="file" accept="image/*" multiple onchange="uploadPhonePhotos(this)">
+                <div class="up-text">📁 Upload multiple photos<br><strong>JPG / PNG</strong></div>
+              </div>
+              <div class="media-grid" id="phone-photos-prev"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIDEO -->
+        <div class="fcard">
+          <div class="fcard-title">🎥 Video of the Phone Problem</div>
+          <div class="fgrid">
+            <div>
+              <div class="cam-box">
+                <div class="cam-placeholder" id="vid-ph"><div class="icon">🎬</div><div>Camera not started</div></div>
+                <video class="cam-video" id="vid-video" autoplay playsinline muted></video>
+                <video id="vid-playback" style="width:100%;border-radius:12px;display:none" controls></video>
+              </div>
+              <div class="cam-btns">
+                <button type="button" class="cbtn" id="vid-start-btn" onclick="startVidCam()">📹 Start Camera</button>
+                <button type="button" class="cbtn" id="vid-rec-btn" onclick="toggleRec()" style="display:none"><span class="rec-dot"></span>Record</button>
+              </div>
+              <div id="vid-timer" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);margin-top:0.4rem"></div>
+            </div>
+            <div>
+              <div class="flbl" style="margin-bottom:0.5rem">Or Upload Video</div>
+              <div class="upzone" style="height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <input type="file" accept="video/*" multiple onchange="uploadVideos(this)">
+                <div class="up-text">📁 Upload video files<br><strong>MP4 / MOV</strong></div>
+              </div>
+              <div class="media-grid" id="video-prev"></div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="sub-btn">✅ SAVE REPAIR JOB</button>
+      </form>
+    </section>
+
+    <!-- ALL JOBS -->
+    <section class="section" id="sec-jobs">
+      <div class="ph">
+        <div><div class="pt">All <span>Repair Jobs</span></div><div class="psub">Full repair registry</div></div>
+        <input class="srch" id="jobs-srch" placeholder="🔍 Search jobs…" oninput="renderJobs()">
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-bar"><div class="tbl-title">REPAIR REGISTRY</div></div>
+        <table><thead><tr><th>Photo</th><th>Job ID</th><th>Customer</th><th>Phone</th><th>Problem</th><th>Price</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="jobs-tbody"></tbody></table>
+      </div>
+    </section>
+
+    <!-- CUSTOMERS -->
+    <section class="section" id="sec-customers">
+      <div class="ph">
+        <div><div class="pt">Customer <span>Database</span></div><div class="psub">All registered customers</div></div>
+        <input class="srch" id="custs-srch" placeholder="🔍 Search customers…" oninput="renderCustomers()">
+      </div>
+      <div class="cust-grid" id="custs-grid"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal-overlay" onclick="closeModalOut(event)">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════ DATA ══════════
+const USERS={jeam:{pass:'jeam2024',name:'Jeam',role:'Lead Engineer'},staff:{pass:'staff123',name:'Staff',role:'Technician'}};
+let jobs=JSON.parse(localStorage.getItem('jeam_jobs')||'[]');
+let customers=JSON.parse(localStorage.getItem('jeam_customers')||'[]');
+let currentUser=null;
+let custPhotoData='',phonePhotosData=[],videoNames=[];
+let phoneColor='';
+let custStream=null,phoneStream=null,vidStream=null;
+let mediaRecorder=null,recChunks=[],isRecording=false,recTimer=null,recSec=0;
+let fpScanned=false,fpCustomer=null;
+
+// ══════════ AUTH ══════════
+function login(){
+  const u=document.getElementById('lu').value.trim().toLowerCase();
+  const p=document.getElementById('lp').value;
+  if(USERS[u]&&USERS[u].pass===p){
+    currentUser={username:u,...USERS[u]};
+    document.getElementById('login-page').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('sb-av').textContent=currentUser.name[0];
+    document.getElementById('sb-nm').textContent=currentUser.name;
+    document.getElementById('sb-rl').textContent=currentUser.role;
+    document.getElementById('f-tech').value=currentUser.name;
+    initDash(); setDefaults();
+  } else { document.getElementById('lerr').style.display='block'; }
+}
+document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+document.getElementById('lu').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+function logout(){stopAllCams();currentUser=null;document.getElementById('app').style.display='none';document.getElementById('login-page').style.display='flex';}
+
+// ══════════ NAV ══════════
+function goTo(name,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='dashboard') initDash();
+  if(name==='jobs') renderJobs();
+  if(name==='customers') renderCustomers();
+}
+
+function setDefaults(){
+  const now=new Date();
+  document.getElementById('f-date').value=now.toISOString().split('T')[0];
+  document.getElementById('dash-dt').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+// ══════════ FINGERPRINT ══════════
+function scanFinger(){
+  if(fpScanned) return;
+  const icon=document.getElementById('fp-icon');
+  const scanning=document.getElementById('fp-scanning');
+  icon.style.display='none';
+  scanning.style.display='block';
+  document.getElementById('fp-status').textContent='Scanning fingerprint…';
+  setTimeout(()=>{
+    scanning.style.display='none';
+    const matched=customers.length>0&&Math.random()<0.65;
+    fpScanned=true;
+    if(matched){
+      const c=customers[Math.floor(Math.random()*customers.length)];
+      fpCustomer=c;
+      document.getElementById('fp-cname').textContent=c.name;
+      document.getElementById('fp-cinfo').textContent=c.phone+' · '+c.jobCount+' previous job(s)';
+      document.getElementById('fp-result').style.display='block';
+      document.getElementById('fp-status').textContent='✅ Fingerprint matched!';
+      document.getElementById('f-cname').value=c.name;
+      document.getElementById('f-cphone').value=c.phone;
+      document.getElementById('f-cphone2').value=c.phone2||'';
+      document.getElementById('f-caddr').value=c.addr||'';
+      if(c.photo){custPhotoData=c.photo;const pv=document.getElementById('cust-preview');pv.src=c.photo;pv.style.display='block';document.getElementById('cust-ph').style.display='none';}
+      showToast('👆 Returning customer recognised!');
+    } else {
+      fpCustomer=null;
+      icon.textContent='🟢'; icon.style.display='block';
+      document.getElementById('fp-new').style.display='block';
+      document.getElementById('fp-status').textContent='New customer — fill in details below';
+      showToast('🆕 New customer detected');
+    }
+  },2000);
+}
+
+function resetFP(){
+  fpScanned=false; fpCustomer=null;
+  const icon=document.getElementById('fp-icon');
+  icon.textContent='🔵'; icon.style.display='block';
+  document.getElementById('fp-scanning').style.display='none';
+  document.getElementById('fp-result').style.display='none';
+  document.getElementById('fp-new').style.display='none';
+  document.getElementById('fp-status').textContent='Tap the fingerprint icon to scan\nReturning customers will be recognised automatically';
+  ['f-cname','f-cphone','f-cphone2','f-caddr'].forEach(id=>document.getElementById(id).value='');
+  custPhotoData='';
+  document.getElementById('cust-preview').style.display='none';
+  document.getElementById('cust-ph').style.display='block';
+}
+
+// ══════════ CAMERA — CUSTOMER ══════════
+async function startCustCam(){
+  try{
+    if(custStream) custStream.getTracks().forEach(t=>t.stop());
+    custStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+    const v=document.getElementById('cust-video');
+    v.srcObject=custStream; v.style.display='block';
+    document.getElementById('cust-ph').style.display='none';
+    document.getElementById('cust-preview').style.display='none';
+  } catch(e){ showToast('❌ Camera not available on this device'); }
+}
+function snapCust(){
+  const v=document.getElementById('cust-video'),c=document.getElementById('cust-canvas');
+  if(!custStream){showToast('Start camera first');return;}
+  c.width=v.videoWidth||320; c.height=v.videoHeight||240;
+  c.getContext('2d').drawImage(v,0,0);
+  custPhotoData=c.toDataURL('image/jpeg',0.85);
+  const pv=document.getElementById('cust-preview');
+  pv.src=custPhotoData; pv.style.display='block';
+  v.style.display='none';
+  custStream.getTracks().forEach(t=>t.stop()); custStream=null;
+  showToast('📸 Customer photo captured!');
+}
+function retakeCust(){
+  document.getElementById('cust-preview').style.display='none';
+  document.getElementById('cust-ph').style.display='block';
+  custPhotoData='';
+}
+function uploadCustPhoto(input){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    custPhotoData=e.target.result;
+    const pv=document.getElementById('cust-preview');
+    pv.src=custPhotoData; pv.style.display='block';
+    document.getElementById('cust-ph').style.display='none';
+    document.getElementById('cust-video').style.display='none';
+  };
+  r.readAsDataURL(f);
+}
+
+// ══════════ CAMERA — PHONE ══════════
+async function startPhoneCam(){
+  try{
+    if(phoneStream) phoneStream.getTracks().forEach(t=>t.stop());
+    phoneStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    const v=document.getElementById('phone-video');
+    v.srcObject=phoneStream; v.style.display='block';
+    document.getElementById('phone-cam-ph').style.display='none';
+  } catch(e){ showToast('❌ Camera not available'); }
+}
+function snapPhone(){
+  const v=document.getElementById('phone-video'),c=document.getElementById('phone-canvas');
+  if(!phoneStream){showToast('Start phone camera first');return;}
+  c.width=v.videoWidth||320; c.height=v.videoHeight||240;
+  c.getContext('2d').drawImage(v,0,0);
+  const d=c.toDataURL('image/jpeg',0.85);
+  phonePhotosData.push(d); addPhoneThumb(d);
+  showToast('📸 Phone photo snapped!');
+}
+function uploadPhonePhotos(input){
+  Array.from(input.files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{phonePhotosData.push(e.target.result); addPhoneThumb(e.target.result);};
+    r.readAsDataURL(f);
+  });
+}
+function addPhoneThumb(src){
+  const prev=document.getElementById('phone-photos-prev');
+  const idx=phonePhotosData.length-1;
+  const w=document.createElement('div'); w.className='m-thumb-wrap';
+  w.innerHTML=`<img class="m-thumb" src="${src}"><button class="m-del" onclick="removePhonePhoto(${idx},this)">×</button>`;
+  prev.appendChild(w);
+}
+function removePhonePhoto(idx,btn){phonePhotosData.splice(idx,1);btn.closest('.m-thumb-wrap').remove();}
+
+// ══════════ VIDEO ══════════
+async function startVidCam(){
+  try{
+    if(vidStream) vidStream.getTracks().forEach(t=>t.stop());
+    vidStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    const v=document.getElementById('vid-video');
+    v.srcObject=vidStream; v.style.display='block';
+    document.getElementById('vid-ph').style.display='none';
+    document.getElementById('vid-rec-btn').style.display='';
+    document.getElementById('vid-start-btn').textContent='🔄 Restart Camera';
+  } catch(e){ showToast('❌ Camera not available'); }
+}
+function toggleRec(){
+  if(!isRecording){
+    recChunks=[];
+    mediaRecorder=new MediaRecorder(vidStream);
+    mediaRecorder.ondataavailable=e=>recChunks.push(e.data);
+    mediaRecorder.onstop=()=>{
+      const blob=new Blob(recChunks,{type:'video/mp4'});
+      const url=URL.createObjectURL(blob);
+      const name='rec_'+Date.now()+'.mp4';
+      videoNames.push(name);
+      addVidThumb(name);
+      document.getElementById('vid-playback').src=url;
+      document.getElementById('vid-playback').style.display='block';
+      showToast('🎥 Video recorded!');
+    };
+    mediaRecorder.start(); isRecording=true; recSec=0;
+    recTimer=setInterval(()=>{recSec++;const m=String(Math.floor(recSec/60)).padStart(2,'0'),s=String(recSec%60).padStart(2,'0');document.getElementById('vid-timer').textContent='⏱ '+m+':'+s;},1000);
+    document.getElementById('vid-rec-btn').innerHTML='⏹ Stop';
+    document.getElementById('vid-rec-btn').style.cssText='background:var(--red);border-color:var(--red);color:#fff;';
+  } else {
+    mediaRecorder.stop(); isRecording=false; clearInterval(recTimer);
+    document.getElementById('vid-rec-btn').innerHTML='<span class="rec-dot"></span>Record';
+    document.getElementById('vid-rec-btn').style.cssText='';
+  }
+}
+function uploadVideos(input){
+  Array.from(input.files).forEach(f=>{videoNames.push(f.name); addVidThumb(f.name);});
+}
+function addVidThumb(name){
+  const prev=document.getElementById('video-prev');
+  const w=document.createElement('div'); w.className='m-thumb-wrap';
+  w.innerHTML=`<div class="vid-thumb">🎥<span>${String(name).slice(0,8)}</span></div><button class="m-del" onclick="this.closest('.m-thumb-wrap').remove()">×</button>`;
+  prev.appendChild(w);
+}
+function stopAllCams(){[custStream,phoneStream,vidStream].forEach(s=>{if(s)s.getTracks().forEach(t=>t.stop());});custStream=phoneStream=vidStream=null;}
+
+// ══════════ COLORS ══════════
+function pickClr(el){
+  document.querySelectorAll('#phone-clr-row .clr-sw').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel'); phoneColor=el.dataset.c;
+  document.getElementById('f-pcolor').value=phoneColor;
+  document.getElementById('pclr-lbl').textContent='● '+phoneColor;
+  document.getElementById('pclr-lbl').style.color=phoneColor==='#ffffff'?'var(--muted)':phoneColor;
+}
+function customClr(input){
+  phoneColor=input.value;
+  document.querySelectorAll('#phone-clr-row .clr-sw').forEach(s=>s.classList.remove('sel'));
+  document.getElementById('f-pcolor').value=phoneColor;
+  document.getElementById('pclr-lbl').textContent='● '+phoneColor;
+  document.getElementById('pclr-lbl').style.color=phoneColor;
+}
+
+// ══════════ SUBMIT ══════════
+function submitJob(e){
+  e.preventDefault();
+  const now=new Date();
+  const cPhone=document.getElementById('f-cphone').value.trim();
+  const cName=document.getElementById('f-cname').value.trim();
+
+  let cust=customers.find(c=>c.phone===cPhone);
+  if(!cust){
+    cust={id:'C-'+Date.now(),name:cName,phone:cPhone,phone2:document.getElementById('f-cphone2').value,addr:document.getElementById('f-caddr').value,photo:custPhotoData,fpId:'FP-'+Math.random().toString(36).slice(2,8).toUpperCase(),jobCount:0,since:now.toISOString()};
+    customers.unshift(cust);
+  }
+  if(custPhotoData) cust.photo=custPhotoData;
+  cust.jobCount=(cust.jobCount||0)+1;
+  localStorage.setItem('jeam_customers',JSON.stringify(customers));
+
+  const job={
+    id:'JOB-'+String(jobs.length+1).padStart(4,'0'),
+    date:now.toISOString(),displayDate:document.getElementById('f-date').value,
+    time:now.toTimeString().slice(0,5),
+    custId:cust.id,custName:cName,custPhone:cPhone,custPhoto:custPhotoData,
+    phoneName:document.getElementById('f-pname').value,
+    phoneBrand:document.getElementById('f-pbrand').value,
+    imei:document.getElementById('f-imei').value,
+    phoneColor:phoneColor||'#888888',
+    condition:document.getElementById('f-pcond').value,
+    accessories:document.getElementById('f-access').value,
+    problem:document.getElementById('f-problem').value,
+    price:document.getElementById('f-price').value||'0',
+    deposit:document.getElementById('f-deposit').value||'0',
+    status:document.getElementById('f-status').value,
+    due:document.getElementById('f-due').value,
+    tech:document.getElementById('f-tech').value,
+    notes:document.getElementById('f-notes').value,
+    phonePhotos:[...phonePhotosData],
+    videos:[...videoNames],
+  };
+  jobs.unshift(job);
+  localStorage.setItem('jeam_jobs',JSON.stringify(jobs));
+
+  // reset
+  document.getElementById('job-form').reset();
+  custPhotoData=''; phonePhotosData=[]; videoNames=[]; phoneColor='';
+  document.getElementById('phone-photos-prev').innerHTML='';
+  document.getElementById('video-prev').innerHTML='';
+  document.getElementById('cust-preview').style.display='none';
+  document.getElementById('cust-ph').style.display='block';
+  document.getElementById('pclr-lbl').textContent='No color selected';
+  document.getElementById('pclr-lbl').style.color='var(--muted)';
+  document.querySelectorAll('.clr-sw').forEach(s=>s.classList.remove('sel'));
+  stopAllCams();
+  ['cust-video','phone-video','vid-video'].forEach(id=>{const v=document.getElementById(id);v.style.display='none';v.srcObject=null;});
+  ['cust-ph','phone-cam-ph','vid-ph'].forEach(id=>document.getElementById(id).style.display='block');
+  document.getElementById('vid-playback').style.display='none';
+  document.getElementById('vid-rec-btn').style.display='none';
+  document.getElementById('vid-timer').textContent='';
+  document.getElementById('vid-start-btn').textContent='📹 Start Camera';
+  document.getElementById('f-tech').value=currentUser.name;
+  resetFP(); setDefaults();
+  showToast('✅ Repair job saved!');
+  setTimeout(()=>goTo('jobs',document.querySelectorAll('.nav-btn')[2]),800);
+}
+
+// ══════════ DASHBOARD ══════════
+function initDash(){
+  const today=new Date().toISOString().split('T')[0];
+  const todayJ=jobs.filter(j=>j.displayDate===today);
+  const rev=jobs.reduce((a,j)=>a+parseFloat(j.price||0),0);
+  document.getElementById('st-total').textContent=jobs.length;
+  document.getElementById('st-today').textContent=todayJ.length;
+  document.getElementById('st-custs').textContent=customers.length;
+  document.getElementById('st-rev').textContent='₦'+rev.toLocaleString();
+  const tbody=document.getElementById('dash-tbody');
+  const recent=jobs.slice(0,7);
+  if(!recent.length){tbody.innerHTML=`<tr><td colspan="7" class="empty">No jobs yet. <a href="#" onclick="goTo('job',document.querySelectorAll('.nav-btn')[1])" style="color:var(--accent)">Log first job →</a></td></tr>`;return;}
+  tbody.innerHTML=recent.map(j=>`<tr>
+    <td>${j.custPhoto?`<img class="thumb-sm" src="${j.custPhoto}">`:'👤'}</td>
+    <td><strong>${j.custName}</strong></td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">${j.custPhone}</td>
+    <td>${j.phoneName}<br><small style="color:var(--muted)">${(j.problem||'').slice(0,35)}…</small></td>
+    <td style="font-family:'JetBrains Mono',monospace">₦${parseFloat(j.price||0).toLocaleString()}</td>
+    <td><span class="badge ${statusBadge(j.status)}">${j.status.split('—')[0].trim()}</span></td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:0.75rem">${j.displayDate}</td>
+  </tr>`).join('');
+  setDefaults();
+}
+
+// ══════════ JOBS TABLE ══════════
+function renderJobs(){
+  const q=(document.getElementById('jobs-srch')?.value||'').toLowerCase();
+  const f=jobs.filter(j=>[j.custName,j.custPhone,j.phoneName,j.id,j.problem,j.status].join(' ').toLowerCase().includes(q));
+  const tbody=document.getElementById('jobs-tbody');
+  if(!f.length){tbody.innerHTML=`<tr><td colspan="9" class="empty">${q?'No results for "'+q+'"':'No jobs yet.'}</td></tr>`;return;}
+  tbody.innerHTML=f.map(j=>`<tr>
+    <td>${j.custPhoto?`<img class="thumb-sm" src="${j.custPhoto}">`:'👤'}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--accent)">${j.id}</td>
+    <td><strong>${j.custName}</strong><br><span style="color:var(--muted);font-size:0.72rem;font-family:'JetBrains Mono',monospace">${j.custPhone}</span></td>
+    <td>${j.phoneName}<br><small style="color:var(--muted)">${j.phoneBrand||''}</small></td>
+    <td>${(j.problem||'').slice(0,35)}${(j.problem||'').length>35?'…':''}</td>
+    <td style="font-family:'JetBrains Mono',monospace">₦${parseFloat(j.price||0).toLocaleString()}</td>
+    <td><span class="badge ${statusBadge(j.status)}">${j.status.split('—')[0].trim()}</span></td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:0.75rem">${j.displayDate}<br>${j.time}</td>
+    <td style="display:flex;gap:4px;flex-wrap:wrap">
+      <button class="act-btn" onclick="openJob('${j.id}')">View</button>
+      <button class="act-btn" onclick="printReceipt('${j.id}')">🖨️</button>
+      <button class="del-btn" onclick="deleteJob('${j.id}')">Del</button>
+    </td>
+  </tr>`).join('');
+}
+
+function statusBadge(s){
+  if(!s) return 'bg-orange';
+  if(s.includes('Completed')||s.includes('Ready')) return 'bg-green';
+  if(s.includes('Under')) return 'bg-blue';
+  if(s.includes('Waiting')) return 'bg-yellow';
+  if(s.includes('Cannot')) return 'bg-red';
+  return 'bg-orange';
+}
+
+function deleteJob(id){
+  if(!confirm('Delete this repair job?')) return;
+  jobs=jobs.filter(j=>j.id!==id);
+  localStorage.setItem('jeam_jobs',JSON.stringify(jobs));
+  renderJobs(); showToast('🗑️ Job deleted');
+}
+
+// ══════════ JOB MODAL ══════════
+function openJob(id){
+  const j=jobs.find(x=>x.id===id); if(!j) return;
+  document.getElementById('modal-body').innerHTML=`
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <div class="modal-title">${j.id}</div>
+    <div class="modal-sub">Logged ${j.displayDate} at ${j.time} · Technician: ${j.tech||'—'}</div>
+    <span class="badge ${statusBadge(j.status)}">${j.status}</span>
+
+    <div class="msec">👤 Customer</div>
+    <div class="mgrid">
+      <div class="mf"><label>Name</label><p>${j.custName}</p></div>
+      <div class="mf"><label>Phone</label><p>${j.custPhone}</p></div>
+    </div>
+    ${j.custPhoto?`<img src="${j.custPhoto}" style="width:80px;height:80px;border-radius:10px;object-fit:cover;border:1px solid var(--border);margin-top:0.8rem">` :''}
+
+    <div class="msec">📱 Device</div>
+    <div class="mgrid">
+      <div class="mf"><label>Phone</label><p>${j.phoneName} ${j.phoneBrand?'('+j.phoneBrand+')':''}</p></div>
+      <div class="mf"><label>IMEI</label><p>${j.imei||'—'}</p></div>
+      <div class="mf"><label>Color</label><p><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${j.phoneColor};border:1px solid rgba(255,255,255,0.2);margin-right:5px;vertical-align:middle"></span>${j.phoneColor}</p></div>
+      <div class="mf"><label>Fault Type</label><p>${j.condition}</p></div>
+      <div class="mf"><label>Accessories</label><p>${j.accessories||'—'}</p></div>
+    </div>
+
+    <div class="msec">🔧 Problem Description</div>
+    <p style="font-size:0.88rem;line-height:1.6;color:var(--text)">${j.problem}</p>
+
+    <div class="msec">💰 Pricing</div>
+    <div class="mgrid">
+      <div class="mf"><label>Repair Price</label><p style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;color:var(--accent)">₦${parseFloat(j.price||0).toLocaleString()}</p></div>
+      <div class="mf"><label>Deposit Paid</label><p style="font-family:'JetBrains Mono',monospace">₦${parseFloat(j.deposit||0).toLocaleString()}</p></div>
+      <div class="mf"><label>Balance Due</label><p style="font-family:'JetBrains Mono',monospace;color:var(--yellow)">₦${(parseFloat(j.price||0)-parseFloat(j.deposit||0)).toLocaleString()}</p></div>
+      <div class="mf"><label>Ready By</label><p>${j.due||'Not set'}</p></div>
+    </div>
+
+    ${j.notes?`<div class="msec">📝 Notes</div><p style="font-size:0.85rem;color:var(--muted)">${j.notes}</p>`:''}
+    ${j.phonePhotos&&j.phonePhotos.length?`<div class="msec">📷 Phone Photos (${j.phonePhotos.length})</div><div class="mimg-grid">${j.phonePhotos.map(s=>`<img class="mimg" src="${s}">`).join('')}</div>`:''}
+    ${j.videos&&j.videos.length?`<div class="msec">🎥 Videos (${j.videos.length})</div><p style="font-size:0.82rem;color:var(--muted)">${j.videos.join(', ')}</p>`:''}
+
+    <button class="receipt-btn" onclick="printReceipt('${j.id}')">🖨️ Print Receipt</button>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+function closeModalOut(e){if(e.target.id==='modal-overlay')closeModal();}
+
+// ══════════ RECEIPT ══════════
+function printReceipt(id){
+  const j=jobs.find(x=>x.id===id); if(!j) return;
+  const w=window.open('','_blank');
+  w.document.write(`<html><head><title>Receipt ${j.id}</title>
+  <style>body{font-family:monospace;padding:2rem;max-width:380px;margin:0 auto}h2,h3{text-align:center}hr{border:1px dashed #000}p{margin:0.35rem 0}.center{text-align:center}@media print{.no-print{display:none}}</style>
+  </head><body>
+  <h2>📱 JEAM MOBILE'S</h2>
+  <h3>Phone Repair Receipt</h3><hr>
+  <p><b>Job ID:</b> ${j.id}</p>
+  <p><b>Date:</b> ${j.displayDate} ${j.time}</p>
+  <p><b>Technician:</b> ${j.tech||'—'}</p><hr>
+  <p><b>Customer:</b> ${j.custName}</p>
+  <p><b>Phone No:</b> ${j.custPhone}</p><hr>
+  <p><b>Device:</b> ${j.phoneName} ${j.phoneBrand?'('+j.phoneBrand+')':''}</p>
+  <p><b>Color:</b> ${j.phoneColor}</p>
+  <p><b>Fault:</b> ${j.condition}</p>
+  <p><b>Problem:</b> ${j.problem}</p>
+  <p><b>Status:</b> ${j.status}</p>
+  ${j.due?`<p><b>Ready by:</b> ${j.due}</p>`:''}<hr>
+  <p><b>Repair Price:</b> ₦${parseFloat(j.price||0).toLocaleString()}</p>
+  <p><b>Deposit Paid:</b> ₦${parseFloat(j.deposit||0).toLocaleString()}</p>
+  <p><b>Balance:</b> ₦${(parseFloat(j.price||0)-parseFloat(j.deposit||0)).toLocaleString()}</p>
+  <hr><p class="center">Thank you for choosing Jeam Mobile's!</p>
+  <p class="center">Please keep this receipt 📄</p>
+  <br><button class="no-print" onclick="window.print()" style="padding:0.5rem 1.5rem;cursor:pointer;width:100%">🖨️ Print</button>
+  </body></html>`);
+  w.document.close();
+}
+
+// ══════════ CUSTOMERS ══════════
+function renderCustomers(){
+  const q=(document.getElementById('custs-srch')?.value||'').toLowerCase();
+  const f=customers.filter(c=>[c.name,c.phone,c.addr].join(' ').toLowerCase().includes(q));
+  const grid=document.getElementById('custs-grid');
+  if(!f.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:3rem">No customers yet.</div>`;return;}
+  grid.innerHTML=f.map(c=>`
+    <div class="cust-card">
+      ${c.photo?`<img class="cust-photo" src="${c.photo}">`:`<div class="cust-photo-ph">${(c.name[0]||'?').toUpperCase()}</div>`}
+      <div class="cust-name">${c.name}</div>
+      <div class="cust-phone">${c.phone}</div>
+      <div class="cust-jobs">🔧 ${c.jobCount||0} repair job(s)</div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:0.3rem">${c.addr||'No address saved'}</div>
+      <div style="font-size:0.65rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:0.3rem">FP ID: ${c.fpId||'—'}</div>
+    </div>
+  `).join('');
+}
+
+// ══════════ TOAST ══════════
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+setDefaults();
+</script>
+</body>
+</html>
